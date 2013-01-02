@@ -20,6 +20,7 @@ namespace RavenDbWorker
         #region Private Fields
 
         private CloudDrive _dataDrive;
+        private CloudDrive _indexDrive;
         private DocumentDatabase _database;
         private HttpServer _server;
 
@@ -131,6 +132,9 @@ namespace RavenDbWorker
                     DataDirectory = _dataDrive.LocalPath.EndsWith("\\")
                                         ? _dataDrive.LocalPath + "Data\\"
                                         : _dataDrive.LocalPath + "\\Data\\",
+                    IndexStoragePath = _indexDrive.LocalPath.EndsWith("\\")
+                                        ? _indexDrive.LocalPath + "Index\\"
+                                        : _indexDrive.LocalPath + "\\Index\\",
                     AnonymousUserAccessMode = anonymousUserAccessMode,
                     HttpCompression = httpCompression,
                     DefaultStorageTypeName = defaultStorageTypeName,
@@ -179,6 +183,8 @@ namespace RavenDbWorker
                 _database.Dispose();
             if (_dataDrive != null)
                 _dataDrive.Unmount();
+            if (_indexDrive != null)
+                _indexDrive.Unmount();
             Trace.TraceWarning("RavenDb: Stopped.");
         }
 
@@ -269,15 +275,42 @@ namespace RavenDbWorker
             Trace.TraceInformation("Cloud Drive: Container = {0}", containerName);
             blobClient.GetContainerReference(containerName).CreateIfNotExist();
 
-            var vhdName = RoleEnvironment.CurrentRoleInstance.Id + ".vhd";
+            var vhdName = RoleEnvironment.CurrentRoleInstance.Id.Replace(RoleEnvironment.DeploymentId + ".", "") + ".ravendata.vhd";
             Trace.TraceInformation("Cloud Drive: VHD = {0}", vhdName);
+
+            var indexvhdName = RoleEnvironment.CurrentRoleInstance.Id.Replace(RoleEnvironment.DeploymentId + ".", "") + ".ravenindex.vhd";
+            Trace.TraceInformation("Cloud Drive: VHD = {0}", indexvhdName);
 
             var vhdUrl = blobClient.GetContainerReference(containerName).GetPageBlobReference(vhdName).Uri.ToString();
             _dataDrive = storageAccount.CreateCloudDrive(vhdUrl);
-            _dataDrive.CreateIfNotExist(localCache.MaximumSizeInMegabytes);
+            _dataDrive.CreateIfNotExist(localCache.MaximumSizeInMegabytes); // TODO Size
 
-            var localPath = _dataDrive.Mount(localCache.MaximumSizeInMegabytes, DriveMountOptions.Force);
+            var indexvhdUrl =
+                blobClient.GetContainerReference(containerName).GetPageBlobReference(indexvhdName).Uri.ToString();
+            _indexDrive = storageAccount.CreateCloudDrive(indexvhdUrl);
+            _indexDrive.CreateIfNotExist(localCache.MaximumSizeInMegabytes); //TODO Size
+
+
+            var localPath = _dataDrive.Mount(localCache.MaximumSizeInMegabytes / 2, DriveMountOptions.Force);
             Trace.TraceInformation("Cloud Drive mounted to {0}", localPath);
+
+            var indexPath = _indexDrive.Mount(localCache.MaximumSizeInMegabytes / 2, DriveMountOptions.Force);
+            Trace.TraceInformation("Cloud Drive mounted to {0}", indexPath);
+
+            var dataPath = _dataDrive.LocalPath.EndsWith("\\")
+                               ? _dataDrive.LocalPath + "Data"
+                               : _dataDrive.LocalPath + "\\Data";
+
+            if (!System.IO.Directory.Exists(dataPath))
+                System.IO.Directory.CreateDirectory(dataPath);
+
+            var indexFullPath = _indexDrive.LocalPath.EndsWith("\\")
+                                ? _indexDrive.LocalPath + "Index"
+                                : _indexDrive.LocalPath + "\\Index";
+
+            if (!System.IO.Directory.Exists(indexFullPath))
+                System.IO.Directory.CreateDirectory(indexFullPath);
+
         }
 
         #endregion
