@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="AzureRavenDB" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="1" osVersion="*" schemaVersion="2012-05.1.7">
+  <Role name="RavenDbWorker">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="StorageAccount" value="UseDevelopmentStorage=true" />
+      <Setting name="AnonymousUserAccessMode" value="All" />
+      <Setting name="HttpCompression" value="true" />
+      <Setting name="DefaultStorageTypeName" value="esent" />
+      <Setting name="CloudDriveContainer" value="raven" />
+      <Setting name="RavenUserName" value="RavenDbUser" />
+      <Setting name="RavenPassword" value="Pa$$w0rd" />
+      <Setting name="EnableTableStorageTraceListener" value="true" />
+      <!-- All these Plugins settings need to be updated.  -->
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="admin" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="This needs to be updated" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2010-12-21T23:59:59.0000000+13:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="Thisneedstobeupdated" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>

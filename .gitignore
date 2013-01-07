@@ -18,4 +18,9 @@ Thumbs.db
 # mstest test results
 TestResults
 
-packages
+packages/
+AzureRavenDB/csx
+ServiceConfiguration.Production.cscfg
+ServiceConfiguration.Development.cscfg
+ServiceConfiguration.Local.cscfg
+*.azurePubxml
