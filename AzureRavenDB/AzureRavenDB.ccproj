@@ -44,6 +44,7 @@
     <ServiceConfiguration Include="ServiceConfiguration.Development.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
     <ServiceDefinition Include="ServiceDefinition.csdef" />
+    <ServiceConfiguration Include="ServiceConfiguration.Example.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Production.cscfg" />
   </ItemGroup>
   <ItemGroup>
